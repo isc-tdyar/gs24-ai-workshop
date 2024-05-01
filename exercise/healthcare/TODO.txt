@@ -1,0 +1,3 @@
+Create LLAMA_INDEX, langchain, and sql options for all the demos (same notebook)
+
+Create Streamlit UI for the workshop

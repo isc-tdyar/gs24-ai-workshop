@@ -4,6 +4,9 @@ import streamlit as st
 # Import ChatOpenAI, a class that provides a simple interface to interact with OpenAI's models.
 from langchain_community.chat_models import ChatOpenAI 
 
+# Import WebBaseLoader, a module that let's us load a web link
+from langchain_community.document_loaders import SeleniumURLLoader
+
 # Import ConversationChain, a class that represents a conversation between a user and an AI.
 from langchain.chains import ConversationChain
 
@@ -24,6 +27,10 @@ from dotenv import load_dotenv
 
 # Load the dotenv (.env) file that provides a few variables we need
 load_dotenv(override=True)
+
+# Load the urlextractor, a module that extracts URLs and will enable us to follow web-links
+from urlextract import URLExtract
+extractor = URLExtract()
 
 # Define username and password for the IRIS connection
 username = 'demo'  # This is the username for the IRIS connection
@@ -103,9 +110,12 @@ with st.sidebar:
     # 1. A selection for our embedding model
     choose_embed = st.radio("Choose an embedding model (don't change for exercise):",("OpenAI Embedding","None"),index=0)
     # 2. We let our users select what vector store to query against
-    choose_dataset = st.radio("Choose an IRIS collection:",("healthcare","finance","None"),index=2)
+    choose_dataset = st.radio("Choose an IRIS collection:",("healthcare","finance"),index=0)
     # 3. We let our uses choose which AI model we want to power our chatbot
-    choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo","None"),index=0)
+    choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo"),index=0)
+    # 4. If the user selected financial dataset, ask if they want to preprocess information
+    finance_enhance = st.radio("Show explanation?:",("No","Yes"),index=1)
+    # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)
 
 # In streamlet, we can add our messages to the user screen by listening to our session
 for msg in st.session_state['messages']:
@@ -155,16 +165,30 @@ if prompt := st.chat_input():
         else:
             # If Nothing, we have No Context
             print("No Dataset selected")
-
+        print(docs_with_score)
         # Here we build the prompt for the AI.
         # Prompt is the user input
         # docs_with_score = vector database result
+        relevant_docs = ["".join(str(doc.page_content)) + " " for doc, _ in docs_with_score]
+        # if link retrieval, then try to scrape the content from the page 
+        
+        # Prefetch the first returned link and include it in the documents
+        
+        # if link_retrieval == "Yes":
+        #     first_relevant_doc = relevant_docs
+        #     urls = extractor.find_urls(str(first_relevant_doc))
+        #     print(urls) # prints: ['stackoverflow.com']     
+        #     web_loader = SeleniumURLLoader(urls[:1])
+        #     web_docs = web_loader.load()
+        #     print(web_docs)
+        #     pass
+        
         template = f"""
-                    Prompt: {prompt}
+Prompt: {prompt}
 
-                    Relevant Documents: {str(docs_with_score)}
+Relevant Documents: {relevant_docs}
 
-                    You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
+You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
                 """
         # And our response is taken care of by the conversation summarization chain with our template prompt
         resp = conversation_sum(template)
@@ -177,5 +201,16 @@ if prompt := st.chat_input():
 
         # And we add to the session state the message history
         st.session_state.messages.append({"role": "assistant", "content": resp['response']})
+        print(resp)
         # And we also add the response from the AI
         st.write(resp['response'].replace("$", "\$"))
+        if finance_enhance == "Yes" and choose_dataset == "finance":
+            with st.expander("Supporting Evidence"):
+                for doc, _ in docs_with_score[:1]:
+                    doc_content = "".join(str(doc.page_content))
+                    st.write(f"""Here are the relevant documents""")
+                    st.write(f"""{doc_content}""")
+                    urls = extractor.find_urls(doc_content)
+                    print(urls) # prints: ['stackoverflow.com']     
+                    for url in urls:       
+                        st.page_link(url, icon="🔗", label="Source")

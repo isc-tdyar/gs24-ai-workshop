@@ -1,141 +1,164 @@
-import iris
-# TODO make these searches generic per table
-class VectorSearch:
-    def __init__(self) -> None:
-        self.conn = iris.connect('localhost',51729,'USER','demo', 'demo')
-        
-    def search_vector_db_with_embedding(self, query_embedding, top_k:int) -> list:
-        query = f"""SELECT TOP 4 data.id
-                    FROM augmented_notes data
-                    ORDER BY VECTOR_DOT_PRODUCT(TO_VECTOR(data.embedding), TO_VECTOR(?)) DESC
-                    """
-        iris_cursor = self.conn.cursor()
-        iris_cursor.execute(query, [str(query_embedding)])
-        origin_list = iris_cursor.fetchall()
-        return origin_list
-    
-    def search_q_and_a_docs(self, story_ids: list[str]) -> list:
-        id_tuple = tuple(story_ids)
-        print(id_tuple)
-        query = f"""SELECT TOP 20 
-                    FROM augmented_note
-                    WHERE id IN {id_tuple}
-                    """
-        iris_cursor = self.conn.cursor()
-        iris_cursor.execute(query)
-        resultset = list(iris_cursor.fetchall())
-        q_and_a_list = [{'question':q_and_a[0], 'answer':q_and_a[1]} for q_and_a in resultset]
-        return q_and_a_list
+# Import Streamlit, a Python library that makes it easy to create and share beautiful, custom web apps for data science and machine learning.
 import streamlit as st
-# from streamlit_jupyter import StreamlitPatcher, tqdm
 
-# StreamlitPatcher().jupyter() 
+# Import ChatOpenAI, a class that provides a simple interface to interact with OpenAI's models.
+from langchain_community.chat_models import ChatOpenAI 
 
-from langchain_community.chat_models import ChatOpenAI
-from langchain.chains import LLMChain, ConversationChain
+# Import ConversationChain, a class that represents a conversation between a user and an AI.
+from langchain.chains import ConversationChain
+
+# Import ConversationSummaryMemory, a class that retains the context of a conversation.
 from langchain.chains.conversation.memory import ConversationSummaryMemory
-from langchain.callbacks import get_openai_callback
-from langchain_text_splitters import CharacterTextSplitter
-from langchain.docstore.document import Document
-from langchain.embeddings import OpenAIEmbeddings
-from langchain_iris import IRISVector
-import os
-# from sentence_transformers import SentenceTransformer
-# from vector_search import VectorSearch
 
+# Import OpenAIEmbeddings, a class that provides a way to perform vector embeddings using OpenAI's embeddings.
+from langchain.embeddings import OpenAIEmbeddings
+
+# Import IRISVector, a class that provides a way to interact with the IRIS vector store.
+from langchain_iris import IRISVector
+
+# Import os, a module that provides a way to use operating system dependent functionality.
+import os
+
+# Import dotenv, a module that provides a way to read environment variable files
 from dotenv import load_dotenv
+
+# Load the dotenv (.env) file that provides a few variables we need
 load_dotenv(override=True)
 
-username = 'demo'
-password = 'demo' 
-hostname = os.getenv('IRIS_HOSTNAME', 'localhost')
-port = '51729' # '1972'
-namespace = 'USER'
-CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}"
+# Define username and password for the IRIS connection
+username = 'demo'  # This is the username for the IRIS connection
+password = 'demo'  # This is the password for the IRIS connection
 
+# Define the hostname for the IRIS connection
+hostname = os.getenv('IRIS_HOSTNAME', 'localhost')  
+# This line gets the hostname from an environment variable IRIS_HOSTNAME, 
+# if the variable is not set, it defaults to 'localhost'
+
+# Define the port number for the IRIS connection
+port = '61209'  # This is the port number for the IRIS connection
+
+# Define the namespace for the IRIS connection
+namespace = 'USER'  # This is the namespace for the IRIS connection
+
+# Create the connection string for the IRIS connection
+CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}"
+# This line creates a connection string for the IRIS connection 
+# in the format iris://username:password@hostname:port/namespace
+
+# Create an instance of OpenAIEmbeddings, a class that provides a way to perform vector embeddings using OpenAI's embeddings.
 embeddings = OpenAIEmbeddings()
 
+# Define the name of the healthcare collection in the IRIS vector store.
 HC_COLLECTION_NAME = "augmented_notes"
+
+# Create an instance of IRISVector, which is a class that provides a way to interact with the IRIS vector store.
+# This instance is for the healthcare collection, and it uses the OpenAI embeddings.
+# The dimension of the embeddings is set to 1536, and the collection name and connection string are specified.
 db = IRISVector(
+    # The embedding function to use for the vector embeddings.
     embedding_function=embeddings,
+    # The dimension of the embeddings (in this case, 1536).
     dimension=1536,
+    # The name of the collection in the IRIS vector store.
     collection_name=HC_COLLECTION_NAME,
+    # The connection string to use for connecting to the IRIS vector store.
     connection_string=CONNECTION_STRING,
 )
 
+# Define the name of the finance collection in the IRIS vector store.
 FINANCE_COLLECTION_NAME = "financial_tweets"
+
+# Create another instance of IRISVector, this time for the finance collection.
+# It also uses the OpenAI embeddings, and has the same dimension and connection string as the healthcare collection.
 db2 = IRISVector(
+    # The embedding function to use for the vector embeddings.
     embedding_function=embeddings,
+    # The dimension of the embeddings (in this case, 1536). This is 1536 because OpenAI Embeddings use that size
     dimension=1536,
+    # The name of the collection in the IRIS vector store.
     collection_name=FINANCE_COLLECTION_NAME,
+    # The connection string to use for connecting to the IRIS vector store.
     connection_string=CONNECTION_STRING,
 )
 
-
+### Used to have a starting message in our application
+# Check if the "messages" key exists in the Streamlit session state.
+# If it doesn't exist, create a new list and assign it to the "messages" key.
 if "messages" not in st.session_state:
+    # Initialize the "messages" list with a welcome message from the assistant.
     st.session_state["messages"] = [
+        # The role of this message is "assistant", and the content is a welcome message.
         {"role": "assistant", "content": "Hi, I'm a chatbot that can access your vector stores. What would you like to know?"}
     ]
 
+# This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
+# The `st.header` function is used to create a header element in the StreamLit application. 
+# In streamlit we can set the application title using the header function
 st.header('GS 2024 Vector Search')
 
-
+# In streamlit we can add settings using the st.sidebar
 with st.sidebar:
+    # Here we are adding three settings
     st.header('Settings')
-    choose_embed = st.radio("Choose an embedding model (don't change for exercise):",("all-MiniLM-L6-v2","OPEN AI Embeddings","None"),index=1)
+    # 1. A selection for our embedding model
+    choose_embed = st.radio("Choose an embedding model (don't change for exercise):",("OpenAI Embedding","None"),index=0)
+    # 2. We let our users select what vector store to query against
     choose_dataset = st.radio("Choose an IRIS collection:",("healthcare","finance","None"),index=2)
+    # 3. We let our uses choose which AI model we want to power our chatbot
     choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo","None"),index=0)
 
-
+# In streamlet, we can add our messages to the user screen by listening to our session
 for msg in st.session_state['messages']:
+    # If the "chat" is coming from AI, we write the content with the ISC logo
     if msg["role"] == "assistant":
         st.chat_message(msg["role"]).write(msg["content"])
+    # If the "chat" is the user, we write the content as the user image, and replace some strings the UI doesn't like
     else:
         st.chat_message(msg["role"]).write(msg["content"].replace("$", "\$"))
 
-if prompt := st.chat_input():
+# Check if the user has entered a prompt (input) in the chat window
+if prompt := st.chat_input(): 
 
+    # Add the user's input to the chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt.replace("$", "\$")) # Escaping '$', otherwise Streamlit can interpret it as Latex
+    
+    # Display the user's input in the chat window, escaping any '$' characters
+    st.chat_message("user").write(prompt.replace("$", "\$"))
 
+    # Create an instance of the ChatOpenAI class, which is a language model
     llm = ChatOpenAI(
-        temperature=0,
-        # openai_api_key=,
-        model_name=choose_LM
+        temperature=0,  # Set the temperature for the language model (0 is default)
+        model_name=choose_LM  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
     )
-    # Create chain. We are using Summary Memory for fewer tokens.
+
+    # Create a ConversationChain instance, which manages the conversation. It'll summarize the conversation and use that summary as context
+    # It uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
     conversation_sum = ConversationChain(
-        llm=llm,
-        memory=ConversationSummaryMemory(llm=llm),
-        verbose=True
+        llm=llm,  # The language model to use
+        memory=ConversationSummaryMemory(llm=llm),  # Summarize the conversation
+        verbose=True  # Set verbosity to True (optional)
     )
 
-
+    # Here we respond to the user based on the messages they receive 
     with st.chat_message("assistant"):
-        #;
-        # Encode the user's prompt and find the top-k similar questions in the vector DB.
-        # embedding = model.encode(prompt)
-        # documents = peristent_DB.search_vector_db_with_embedding(str(embedding.tolist()), top_k=4)
-        # doc_content_list, doc_id_list = map(list, zip(*documents))
-        # doc_list = [Document(page_content=doc_content, metadata={"source": "local"}) for doc_content in doc_content_list]
-        #;
-        # This can potentially return many large documents, so we should use LangChain to chunk the results:
-        # text_splitter = CharacterTextSplitter(chunk_size=250, chunk_overlap=0)
-        # docs = text_splitter.split_documents(doc_list)
-        #;
-        # q_and_a_docs = peristent_DB.search_q_and_a_docs(doc_id_list)
-
-        # relevant_docs = [str(doc.page_content)[:250] for doc in docs]
+        # We rename our prompt (user input) to query to better illustrate that we'll compare it to the vector store
         query = prompt
+        # We'll store the most similar results from the vector database here
         docs_with_score = None
+        # Based on the dataset, we will compare the user query to the proper vector store
         if choose_dataset == "healthcare":
+            # If Healthcare, that's db (collection name HC_COLLECTION_NAME)
             docs_with_score = db.similarity_search_with_score(query)
         elif choose_dataset == "finance":
+            # If Finance, that's db2 (collection name FINANCE_COLLECTION)
             docs_with_score = db2.similarity_search_with_score(query)
         else:
+            # If Nothing, we have No Context
             print("No Dataset selected")
-        # relevant_docs[:]
 
+        # Here we build the prompt for the AI.
+        # Prompt is the user input
+        # docs_with_score = vector database result
         template = f"""
                     Prompt: {prompt}
 
@@ -143,12 +166,16 @@ if prompt := st.chat_input():
 
                     You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
                 """
+        # And our response is taken care of by the conversation summarization chain with our template prompt
         resp = conversation_sum(template)
         
+        # Finally, we make sure that if the user didn't put anything or cleared session, we reset the page
         if "messages" not in st.session_state:
             st.session_state["messages"] = [
                 {"role": "assistant", "content": "Hi, I'm a chatbot that can access your vector stores. What would you like to know?"}
             ]
 
+        # And we add to the session state the message history
         st.session_state.messages.append({"role": "assistant", "content": resp['response']})
+        # And we also add the response from the AI
         st.write(resp['response'].replace("$", "\$"))

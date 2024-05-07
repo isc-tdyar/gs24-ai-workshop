@@ -114,7 +114,7 @@ with st.sidebar:
     # 3. We let our uses choose which AI model we want to power our chatbot
     choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo"),index=0)
     # 4. If the user selected financial dataset, ask if they want to preprocess information
-    finance_enhance = st.radio("Show explanation?:",("No","Yes"),index=1)
+    explain = st.radio("Show explanation?:",("No","Yes"),index=1)
     # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)
 
 # In streamlet, we can add our messages to the user screen by listening to our session
@@ -191,6 +191,10 @@ Relevant Documents: {relevant_docs}
 You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
                 """
         # And our response is taken care of by the conversation summarization chain with our template prompt
+        # chunks = []
+        # for chunk in conversation_sum.stream(template):
+        #     chunks.append(chunk)
+        # print(chunks)
         resp = conversation_sum(template)
         
         # Finally, we make sure that if the user didn't put anything or cleared session, we reset the page
@@ -204,13 +208,13 @@ You should only make use of the provided Relevant Documents. They are important 
         print(resp)
         # And we also add the response from the AI
         st.write(resp['response'].replace("$", "\$"))
-        if finance_enhance == "Yes" and choose_dataset == "finance":
+        if explain == "Yes":
             with st.expander("Supporting Evidence"):
                 for doc, _ in docs_with_score[:1]:
                     doc_content = "".join(str(doc.page_content))
-                    st.write(f"""Here are the relevant documents""")
+                    # st.write(f"""Here are the relevant documents""")
                     st.write(f"""{doc_content}""")
                     urls = extractor.find_urls(doc_content)
                     print(urls) # prints: ['stackoverflow.com']     
                     for url in urls:       
-                        st.page_link(url, icon="🔗", label="Source")
+                        st.page_link(url, label="Source")

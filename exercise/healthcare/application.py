@@ -80,6 +80,8 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "Hi, I'm a chatbot that can access your vector stores. What would you like to know?"}
     ]
 
+# *** Add a title for the application ***
+# TODO: delete the existing title
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
 st.header('GS 2024 Vector Search')
 
@@ -115,6 +117,8 @@ if prompt := st.chat_input():
     # Display the user's input in the chat window, escaping any '$' characters
     st.chat_message("user").write(prompt.replace("$", "\$"))
 
+# *** Change the precision of the AI model ***
+# Update the temperature to a value between 0 and 1 to adjust the precision - 0 is the most precise
     # Create an instance of the ChatOpenAI class, which is a language model
     llm = ChatOpenAI(
         temperature=0,  # Set the temperature for the language model (0 is default)
@@ -161,7 +165,7 @@ if prompt := st.chat_input():
         #     pass
         
     # *** Create LLM Prompt ***
-    ##TODO: Remove code from this line through line 173. 
+    ##TODO: Remove code from this line through line 171. 
         template = f"""
 Prompt: {prompt}
 

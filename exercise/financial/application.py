@@ -1,60 +1,42 @@
-# Import Streamlit, a Python library that makes it easy to create and share beautiful, custom web apps for data science and machine learning.
+# Import the Python libaries that will be used for this app.
+# Libraries of note: 
+# Streamlit, a Python library that makes it easy to create and share beautiful, custom web apps for data science and machine learning.
+# ChatOpenAI, a class that provides a simple interface to interact with OpenAI's models.
+# ConversationChain and ConversationSummaryMemory, classes that represents a conversation between a user and an AI and retain the context of a conversation.
+# OpenAIEmbeddings, a class that provides a way to perform vector embeddings using OpenAI's embeddings.
+# IRISVector, a class that provides a way to interact with the IRIS vector store.
 import streamlit as st
-
-# Import ChatOpenAI, a class that provides a simple interface to interact with OpenAI's models.
 from langchain_community.chat_models import ChatOpenAI 
-
-# Import WebBaseLoader, a module that let's us load a web link
 from langchain_community.document_loaders import SeleniumURLLoader
-
-# Import ConversationChain, a class that represents a conversation between a user and an AI.
 from langchain.chains import ConversationChain
-
-# Import ConversationSummaryMemory, a class that retains the context of a conversation.
 from langchain.chains.conversation.memory import ConversationSummaryMemory
-
-# Import OpenAIEmbeddings, a class that provides a way to perform vector embeddings using OpenAI's embeddings.
 from langchain.embeddings import OpenAIEmbeddings
-
-# Import IRISVector, a class that provides a way to interact with the IRIS vector store.
 from langchain_iris import IRISVector
-
-# Import os, a module that provides a way to use operating system dependent functionality.
 import os
 
-# Import dotenv, a module that provides a way to read environment variable files
+# Import dotenv, a module that provides a way to read environment variable files, and load the dotenv (.env) file that provides a few variables we need
 from dotenv import load_dotenv
-
-# Load the dotenv (.env) file that provides a few variables we need
 load_dotenv(override=True)
 
 # Load the urlextractor, a module that extracts URLs and will enable us to follow web-links
 from urlextract import URLExtract
 extractor = URLExtract()
 
-# Define username and password for the IRIS connection
+# Define the IRIS connection - the username, password, hostname, port, and namespace for the IRIS connection.
 username = 'demo'  # This is the username for the IRIS connection
 password = 'demo'  # This is the password for the IRIS connection
-
-# Define the hostname for the IRIS connection
 hostname = os.getenv('IRIS_HOSTNAME', 'localhost')  
-# This line gets the hostname from an environment variable IRIS_HOSTNAME, 
-# if the variable is not set, it defaults to 'localhost'
-
-# Define the port number for the IRIS connection
 port = '61209'  # This is the port number for the IRIS connection
-
-# Define the namespace for the IRIS connection
 namespace = 'USER'  # This is the namespace for the IRIS connection
 
 # Create the connection string for the IRIS connection
 CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}"
-# This line creates a connection string for the IRIS connection 
-# in the format iris://username:password@hostname:port/namespace
 
 # Create an instance of OpenAIEmbeddings, a class that provides a way to perform vector embeddings using OpenAI's embeddings.
 embeddings = OpenAIEmbeddings()
 
+# *** Instantiate IRISVector ***
+##TODO: Remove code from this line through line 72.
 # Define the name of the healthcare collection in the IRIS vector store.
 HC_COLLECTION_NAME = "augmented_notes"
 
@@ -99,13 +81,11 @@ if "messages" not in st.session_state:
     ]
 
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
-# The `st.header` function is used to create a header element in the StreamLit application. 
-# In streamlit we can set the application title using the header function
 st.header('GS 2024 Vector Search')
 
+# *** Customize the UI ***
 # In streamlit we can add settings using the st.sidebar
 with st.sidebar:
-    # Here we are adding three settings
     st.header('Settings')
     # 1. A selection for our embedding model
     choose_embed = st.radio("Choose an embedding model (don't change for exercise):",("OpenAI Embedding","None"),index=0)
@@ -140,9 +120,8 @@ if prompt := st.chat_input():
         temperature=0,  # Set the temperature for the language model (0 is default)
         model_name=choose_LM  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
     )
-
-    # Create a ConversationChain instance, which manages the conversation. It'll summarize the conversation and use that summary as context
-    # It uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
+ # *** Create a ConversationChain Instance ***
+ # This uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
     conversation_sum = ConversationChain(
         llm=llm,  # The language model to use
         memory=ConversationSummaryMemory(llm=llm),  # Summarize the conversation
@@ -166,9 +145,7 @@ if prompt := st.chat_input():
             # If Nothing, we have No Context
             print("No Dataset selected")
         print(docs_with_score)
-        # Here we build the prompt for the AI.
-        # Prompt is the user input
-        # docs_with_score = vector database result
+        # Here we build the prompt for the AI: Prompt is the user input and docs_with_score is the vector database result
         relevant_docs = ["".join(str(doc.page_content)) + " " for doc, _ in docs_with_score]
         # if link retrieval, then try to scrape the content from the page 
         
@@ -183,6 +160,8 @@ if prompt := st.chat_input():
         #     print(web_docs)
         #     pass
         
+    # *** Create LLM Prompt ***
+    ##TODO: Remove code from this line through line 173. 
         template = f"""
 Prompt: {prompt}
 

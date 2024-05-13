@@ -35,15 +35,24 @@ CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}
 # Create an instance of OpenAIEmbeddings, a class that provides a way to perform vector embeddings using OpenAI's embeddings.
 embeddings = OpenAIEmbeddings()
 
+# *** Instantiate IRISVector ***
 ##TODO: Remove code from this line through line 72.
 # Define the name of the healthcare collection in the IRIS vector store.
 HC_COLLECTION_NAME = "augmented_notes"
 
-# *** Instantiate IRISVector ***
 # Create an instance of IRISVector, which is a class that provides a way to interact with the IRIS vector store.
 # This instance is for the healthcare collection, and it uses the OpenAI embeddings.
 # The dimension of the embeddings is set to 1536, and the collection name and connection string are specified.
-## INSERT CODE HERE
+db = IRISVector(
+    # The embedding function to use for the vector embeddings.
+    embedding_function=embeddings,
+    # The dimension of the embeddings (in this case, 1536).
+    dimension=1536,
+    # The name of the collection in the IRIS vector store.
+    collection_name=HC_COLLECTION_NAME,
+    # The connection string to use for connecting to the IRIS vector store.
+    connection_string=CONNECTION_STRING,
+)
 
 # Define the name of the finance collection in the IRIS vector store.
 FINANCE_COLLECTION_NAME = "financial_tweets"
@@ -72,6 +81,7 @@ if "messages" not in st.session_state:
     ]
 
 # *** Add a title for the application ***
+# TODO: delete the existing title
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
 st.header('GS 2024 Vector Search')
 
@@ -114,9 +124,13 @@ if prompt := st.chat_input():
         temperature=0,  # Set the temperature for the language model (0 is default)
         model_name=choose_LM  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
     )
-# *** Create a ConversationChain Instance ***
-# This uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
-## INSERT CODE HERE
+ # *** Create a ConversationChain Instance ***
+ # This uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
+    conversation_sum = ConversationChain(
+        llm=llm,  # The language model to use
+        memory=ConversationSummaryMemory(llm=llm),  # Summarize the conversation
+        verbose=True  # Set verbosity to True (optional)
+    )
 
     # Here we respond to the user based on the messages they receive 
     with st.chat_message("assistant"):
@@ -151,10 +165,14 @@ if prompt := st.chat_input():
         #     pass
         
     # *** Create LLM Prompt ***
-    ## INSERT CODE HERE
+    ##TODO: Remove code from this line through line 171. 
+        template = f"""
+Prompt: {prompt}
 
+Relevant Documents: {relevant_docs}
 
-    
+You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
+                """
         # And our response is taken care of by the conversation summarization chain with our template prompt
         # chunks = []
         # for chunk in conversation_sum.stream(template):

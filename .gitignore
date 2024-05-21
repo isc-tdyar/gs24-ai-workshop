@@ -1,3 +1,4 @@
 .env
 example-app/
 *.DS_Store
+*.zip

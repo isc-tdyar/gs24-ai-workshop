@@ -88,7 +88,7 @@ if "messages" not in st.session_state:
 # *** Add a title for the application ***
 # TODO: delete the existing title
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
-st.header("GS 2024 Vector Search")
+st.header("↗️GS 2024 Vector Search↗️")
 
 # *** Customize the UI ***
 # In streamlit we can add settings using the st.sidebar
@@ -101,12 +101,13 @@ with st.sidebar:
         "Choose an IRIS collection:", ("healthcare", "finance"), index=1
     )
     # 3. We let our uses choose which AI model we want to power our chatbot
-    choose_LM = st.radio(
-        "Choose a language model:", ("gpt-3.5-turbo", "gpt-4-turbo"), index=0
-    )
-    temperature_slider = st.slider("Temperature", float(0), float(1), float(0.5), float(0.01))
+    # choose_LM = st.radio(
+    #     "Choose a language model:", "gpt-4-turbo",''), index=0
+    # )
+
     # 4. If the user selected financial dataset, ask if they want to preprocess information
     explain = st.radio("Show explanation?:", ("Yes", "No"), index=0)
+    temperature_slider = st.slider("Temperature", float(0), float(1), float(0.0), float(0.01))
     # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)
 
 # In streamlet, we can add our messages to the user screen by listening to our session
@@ -132,7 +133,7 @@ if prompt := st.chat_input():
     # Create an instance of the ChatOpenAI class, which is a language model
     llm = ChatOpenAI(
         temperature=temperature_slider,  # Set the temperature for the language model (0 is default)
-        model_name=choose_LM,  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
+        model_name='gpt-4-turbo',  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
     )
     # *** Create a ConversationChain Instance ***
     # This uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation

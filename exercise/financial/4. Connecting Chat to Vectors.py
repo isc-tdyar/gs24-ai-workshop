@@ -23,10 +23,10 @@ from urlextract import URLExtract
 extractor = URLExtract()
 
 # Define the IRIS connection - the username, password, hostname, port, and namespace for the IRIS connection.
-username = 'demo'  # This is the username for the IRIS connection
-password = 'demo'  # This is the password for the IRIS connection
-hostname = os.getenv('IRIS_HOSTNAME', 'localhost')  
-port = '61209'  # This is the port number for the IRIS connection
+username = '_SYSTEM'  # This is the username for the IRIS connection
+password = 'SYS'  # This is the password for the IRIS connection
+hostname = 'iris'
+port = 1972  # This is the port number for the IRIS connection
 namespace = 'USER'  # This is the namespace for the IRIS connection
 
 # Create the connection string for the IRIS connection

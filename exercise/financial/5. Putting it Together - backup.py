@@ -85,34 +85,29 @@ if "messages" not in st.session_state:
         }
     ]
 
-# Initialize conversation chain in session state if not present
-if "conversation_sum" not in st.session_state:
-    llm = ChatOpenAI(
-        temperature=0.0,
-        model_name='gpt-4-turbo',
-    )
-    st.session_state["conversation_sum"] = ConversationChain(
-        llm=llm,
-        memory=ConversationSummaryMemory(llm=llm),
-        verbose=True,
-    )
+# *** Add a title for the application ***
 
-# Add a title for the application
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
 st.header("↗️GS 2024 Vector Search↗️")
 
-# Customize the UI
+# *** Customize the UI ***
 # In streamlit we can add settings using the st.sidebar
 with st.sidebar:
     st.header("Settings")
-    # We let our users select what vector store to query against
+    # 1. A selection for our embedding model
+    # choose_embed = st.radio("Choose an embedding model (don't change for exercise):",("OpenAI Embedding","None"),index=0)
+    # 2. We let our users select what vector store to query against
     choose_dataset = st.radio(
         "Choose an IRIS collection:", ("healthcare", "finance"), index=1
     )
+    # 3. We let our uses choose which AI model we want to power our chatbot
+    # choose_LM = st.radio(
+    #     "Choose a language model:", "gpt-4-turbo",''), index=0
+    # )
 
-    # Allow user to toggle whether explanation is shown with responses
+    # 4. If the user selected financial dataset, ask if they want to preprocess information
     explain = st.radio("Show explanation?:", ("Yes", "No"), index=0)
-    temperature_slider = st.slider("Temperature", float(0), float(1), float(0.0), float(0.01))
+    ### Add temperature slider here
     # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)
 
 # In streamlet, we can add our messages to the user screen by listening to our session
@@ -133,14 +128,16 @@ if prompt := st.chat_input():
     # Display the user's input in the chat window, escaping any '$' characters
     st.chat_message("user").write(prompt.replace("$", "\$"))
 
+    # *** Change the precision of the AI model ***
+    # Update the temperature to a value between 0 and 1 to adjust the precision - 0 is the most precise
     # Create an instance of the ChatOpenAI class, which is a language model
     llm = ChatOpenAI(
         temperature=temperature_slider,  # Set the temperature for the language model (0 is default)
         model_name='gpt-4-turbo',  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
     )
-
-    # Retrieve the conversation chain instance from session state.
-    conversation_sum = st.session_state["conversation_sum"]
+    # *** Create a ConversationChain Instance ***
+    # This uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
+### Add conversation chain code here
 
     # Here we respond to the user based on the messages they receive
     with st.chat_message("assistant"):
@@ -163,9 +160,10 @@ if prompt := st.chat_input():
         relevant_docs = [
             "".join(str(doc.page_content)) + " " for doc, _ in docs_with_score
         ]
-       
         # if link retrieval, then try to scrape the content from the page
+
         # Prefetch the first returned link and include it in the documents
+
         # if link_retrieval == "Yes":
         #     first_relevant_doc = relevant_docs
         #     urls = extractor.find_urls(str(first_relevant_doc))
@@ -174,27 +172,16 @@ if prompt := st.chat_input():
         #     web_docs = web_loader.load()
         #     print(web_docs)
         #     pass
-        
-        # Get conversation history from memory
-        conversation_history = conversation_sum.memory.load_memory_variables({})['history']
 
         # *** Create LLM Prompt ***
-        template = f"""
-
-Prompt: {prompt}
-
-Conversation History: {conversation_history}
-
-Relevant Documents: {relevant_docs}
-
-
-
-You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
-
-                """
+### Add prompt code here
 
         # And our response is taken care of by the conversation summarization chain with our template prompt
-        resp = conversation_sum.predict(input=template)
+        # chunks = []
+        # for chunk in conversation_sum.stream(template):
+        #     chunks.append(chunk)
+        # print(chunks)
+        resp = conversation_sum(template)
 
         # Finally, we make sure that if the user didn't put anything or cleared session, we reset the page
         if "messages" not in st.session_state:
@@ -207,12 +194,11 @@ You should only make use of the provided Relevant Documents. They are important 
 
         # And we add to the session state the message history
         st.session_state.messages.append(
-            {"role": "assistant", "content": resp}
+            {"role": "assistant", "content": resp["response"]}
         )
         print(resp)
-        
         # And we also add the response from the AI
-        st.write(resp.replace("$", "\$"))
+        st.write(resp["response"].replace("$", "\$"))
         if explain == "Yes":
             with st.expander("Supporting Evidence"):
                 for doc, _ in docs_with_score[:1]:

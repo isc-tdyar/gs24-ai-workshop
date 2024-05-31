@@ -50,7 +50,7 @@ if "messages" not in st.session_state:
     ]
 
 # *** Add a title for the application ***
-# TODO: delete the existing title
+
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
 st.header('GS 2024 Vector Search')
 

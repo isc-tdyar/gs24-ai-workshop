@@ -1,4 +1,3 @@
-       
 # Import the Python libaries that will be used for this app.
 # Libraries of note: 
 # Streamlit, a Python library that makes it easy to create and share beautiful, custom web apps for data science and machine learning.
@@ -37,39 +36,8 @@ CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}
 embeddings = OpenAIEmbeddings()
 
 # *** Instantiate IRISVector ***
-##TODO: Remove code from this line through line 72.
-# Define the name of the healthcare collection in the IRIS vector store.
-# HC_COLLECTION_NAME = "augmented_notes"
 
-# # Create an instance of IRISVector, which is a class that provides a way to interact with the IRIS vector store.
-# # This instance is for the healthcare collection, and it uses the OpenAI embeddings.
-# # The dimension of the embeddings is set to 1536, and the collection name and connection string are specified.
-# db = IRISVector(
-#     # The embedding function to use for the vector embeddings.
-#     embedding_function=embeddings,
-#     # The dimension of the embeddings (in this case, 1536).
-#     dimension=1536,
-#     # The name of the collection in the IRIS vector store.
-#     collection_name=HC_COLLECTION_NAME,
-#     # The connection string to use for connecting to the IRIS vector store.
-#     connection_string=CONNECTION_STRING,
-# )
-
-# Define the name of the finance collection in the IRIS vector store.
-FINANCE_COLLECTION_NAME = "financial_tweets"
-
-# Create another instance of IRISVector, this time for the finance collection.
-# It also uses the OpenAI embeddings, and has the same dimension and connection string as the healthcare collection.
-db2 = IRISVector(
-    # The embedding function to use for the vector embeddings.
-    embedding_function=embeddings,
-    # The dimension of the embeddings (in this case, 1536). This is 1536 because OpenAI Embeddings use that size
-    dimension=1536,
-    # The name of the collection in the IRIS vector store.
-    collection_name=FINANCE_COLLECTION_NAME,
-    # The connection string to use for connecting to the IRIS vector store.
-    connection_string=CONNECTION_STRING,
-)
+### Add IRISVector code here
 
 ### Used to have a starting message in our application
 # Check if the "messages" key exists in the Streamlit session state.
@@ -166,14 +134,9 @@ if prompt := st.chat_input():
         #     pass
         
     # *** Create LLM Prompt ***
-    ##TODO: Remove code from this line through line 171. 
-        template = f"""
-Prompt: {prompt}
 
-Relevant Documents: {relevant_docs}
+### Add prompting code here
 
-You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
-                """
         # And our response is taken care of by the conversation summarization chain with our template prompt
         # chunks = []
         # for chunk in conversation_sum.stream(template):

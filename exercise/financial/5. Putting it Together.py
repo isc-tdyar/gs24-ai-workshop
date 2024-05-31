@@ -38,7 +38,7 @@ CONNECTION_STRING = f"iris://{username}:{password}@{hostname}:{port}/{namespace}
 embeddings = OpenAIEmbeddings()
 
 # *** Instantiate IRISVector ***
-##TODO: Remove code from this line through line 72.
+
 # Define the name of the healthcare collection in the IRIS vector store.
 HC_COLLECTION_NAME = "augmented_notes"
 
@@ -72,7 +72,7 @@ db2 = IRISVector(
     connection_string=CONNECTION_STRING,
 )
 
-### Used to have a starting message in our application
+# Used to have a starting message in our application
 # Check if the "messages" key exists in the Streamlit session state.
 # If it doesn't exist, create a new list and assign it to the "messages" key.
 if "messages" not in st.session_state:
@@ -107,7 +107,7 @@ with st.sidebar:
 
     # 4. If the user selected financial dataset, ask if they want to preprocess information
     explain = st.radio("Show explanation?:", ("Yes", "No"), index=0)
-    temperature_slider = st.slider("Temperature", float(0), float(1), float(0.0), float(0.01))
+    ### Add temperature slider here
     # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)
 
 # In streamlet, we can add our messages to the user screen by listening to our session
@@ -137,11 +137,7 @@ if prompt := st.chat_input():
     )
     # *** Create a ConversationChain Instance ***
     # This uses the language model (llm) and a ConversationSummaryMemory instance for summarizing the conversation
-    conversation_sum = ConversationChain(
-        llm=llm,  # The language model to use
-        memory=ConversationSummaryMemory(llm=llm),  # Summarize the conversation
-        verbose=True,  # Set verbosity to True (optional)
-    )
+### Add conversation chain code here
 
     # Here we respond to the user based on the messages they receive
     with st.chat_message("assistant"):
@@ -179,13 +175,8 @@ if prompt := st.chat_input():
 
         # *** Create LLM Prompt ***
         ##TODO: Remove code from this line through line 171.
-        template = f"""
-Prompt: {prompt}
+### Add prompt code here
 
-Relevant Documents: {relevant_docs}
-
-You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
-                """
         # And our response is taken care of by the conversation summarization chain with our template prompt
         # chunks = []
         # for chunk in conversation_sum.stream(template):

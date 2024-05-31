@@ -63,7 +63,7 @@ with st.sidebar:
     # 2. We let our users select what vector store to query against
     # choose_dataset = st.radio("Choose an IRIS collection:",("healthcare","finance"),index=1)
     # 3. We let our uses choose which AI model we want to power our chatbot
-    choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo"),index=0)
+    choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo"),index=1)
     # 4. If the user selected financial dataset, ask if they want to preprocess information
     explain = st.radio("Show explanation?:",("Yes", "No"),index=0)
     # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)

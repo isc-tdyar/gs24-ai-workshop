@@ -136,7 +136,7 @@ if prompt := st.chat_input():
 
     # Create an instance of the ChatOpenAI class, which is a language model
     llm = ChatOpenAI(
-        temperature=temperature_slider,  # Set the temperature for the language model (0 is default)
+        temperature=0,  # Set the temperature for the language model (0 is default)
         model_name='gpt-4-turbo',  # Use the selected language model (gpt-3.5-turbo or gpt-4-turbo)
     )
 
@@ -181,17 +181,13 @@ if prompt := st.chat_input():
 
         # *** Create LLM Prompt ***
         template = f"""
-
 Prompt: {prompt}
 
-Conversation History: {conversation_history}
+### Add conversation history here
 
 Relevant Documents: {relevant_docs}
 
-
-
-You should only make use of the provided Relevant Documents. They are important information belonging to the user, and it is important that any advice you give is grounded in these documents. If the documents are irrelevant to the question, simply state that you do not have the relevant information available in the database.
-
+### Add guard rails here
                 """
 
         # And our response is taken care of by the conversation summarization chain with our template prompt

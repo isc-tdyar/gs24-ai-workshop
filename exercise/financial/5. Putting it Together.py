@@ -109,7 +109,8 @@ with st.sidebar:
     choose_dataset = st.radio(
         "Choose an IRIS collection:", ("healthcare", "finance"), index=1
     )
-
+    # Allow user to toggle which model is being used (gpt-4 in this workshop)
+    choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo"),index=1)
     # Allow user to toggle whether explanation is shown with responses
     explain = st.radio("Show explanation?:", ("Yes", "No"), index=0)
     temperature_slider = st.slider("Temperature", float(0), float(1), float(0.0), float(0.01))

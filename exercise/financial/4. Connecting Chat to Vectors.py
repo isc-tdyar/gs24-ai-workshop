@@ -49,22 +49,17 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "Hi, I'm a chatbot that can access your vector stores. What would you like to know?"}
     ]
 
-# *** Add a title for the application ***
-
+# Add a title for the application
 # This line creates a header in the Streamlit application with the title "GS 2024 Vector Search"
 st.header('GS 2024 Vector Search')
 
-# *** Customize the UI ***
+# Customize the UI
 # In streamlit we can add settings using the st.sidebar
 with st.sidebar:
     st.header('Settings')
-    # 1. A selection for our embedding model
-    # choose_embed = st.radio("Choose an embedding model (don't change for exercise):",("OpenAI Embedding","None"),index=0)
-    # 2. We let our users select what vector store to query against
-    # choose_dataset = st.radio("Choose an IRIS collection:",("healthcare","finance"),index=1)
-    # 3. We let our uses choose which AI model we want to power our chatbot
+    # Allow user to toggle which model is being used (gpt-4 in this workshop)
     choose_LM = st.radio("Choose a language model:",("gpt-3.5-turbo","gpt-4-turbo"),index=1)
-    # 4. If the user selected financial dataset, ask if they want to preprocess information
+    # Allow user to toggle whether explanation is shown with responses
     explain = st.radio("Show explanation?:",("Yes", "No"),index=0)
     # link_retrieval = st.radio("Retrieve Links?:",("No","Yes"),index=0)
 
@@ -86,8 +81,6 @@ if prompt := st.chat_input():
     # Display the user's input in the chat window, escaping any '$' characters
     st.chat_message("user").write(prompt.replace("$", "\$"))
 
-# *** Change the precision of the AI model ***
-# Update the temperature to a value between 0 and 1 to adjust the precision - 0 is the most precise
     # Create an instance of the ChatOpenAI class, which is a language model
     llm = ChatOpenAI(
         temperature=0,  # Set the temperature for the language model (0 is default)
@@ -108,22 +101,15 @@ if prompt := st.chat_input():
         # We'll store the most similar results from the vector database here
         docs_with_score = None
         # Based on the dataset, we will compare the user query to the proper vector store
-        # if choose_dataset == "healthcare":
-        #     # If Healthcare, that's db (collection name HC_COLLECTION_NAME)
-        #     docs_with_score = db.similarity_search_with_score(query)
-        # elif choose_dataset == "finance":
-            # If Finance, that's db2 (collection name FINANCE_COLLECTION)
         docs_with_score = db2.similarity_search_with_score(query)
-        # else:
-        #     # If Nothing, we have No Context
-        #     print("No Dataset selected")
+
         print(docs_with_score)
+
         # Here we build the prompt for the AI: Prompt is the user input and docs_with_score is the vector database result
         relevant_docs = ["".join(str(doc.page_content)) + " " for doc, _ in docs_with_score]
+        
         # if link retrieval, then try to scrape the content from the page 
-        
         # Prefetch the first returned link and include it in the documents
-        
         # if link_retrieval == "Yes":
         #     first_relevant_doc = relevant_docs
         #     urls = extractor.find_urls(str(first_relevant_doc))

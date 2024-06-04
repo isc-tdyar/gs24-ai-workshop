@@ -88,7 +88,7 @@ if "messages" not in st.session_state:
 # Initialize conversation chain in session state if not present
 if "conversation_sum" not in st.session_state:
     llm = ChatOpenAI(
-        temperature=0.0,
+        temperature=temperature_slider,
         model_name='gpt-4-turbo',
     )
     st.session_state["conversation_sum"] = ConversationChain(

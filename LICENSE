@@ -1,0 +1,55 @@
+InterSystems Repository Terms of Use
+
+Your use of any InterSystems Content available on this site shall be governed by these Terms and Conditions.  By downloading and/or using any InterSystems Content you hereby consent to these Terms and Conditions.
+
+
+Definitions
+
+"InterSystems" refers to InterSystems Corporation, a Massachusetts, USA corporation. "You" refers to (a) a company or organization (each an "Entity") on behalf of which an individual is accessing any InterSystems Content, or (b) an individual accessing any Content on such individual’s own behalf.  "InterSystems Content” or “Content" refers to any content made available by InterSystems on this site, such as software programs, updates, error corrections or documentation, but shall not include Separately Licensed Content.  "Separately Licensed Content" refers to InterSystems or third-party content that is licensed or accessed under Separate Terms.  "Separate Terms" refers to license, access or other terms of use that are separate from these terms and conditions under which InterSystems Content is made available to You.  For the avoidance of doubt, InterSystems Content shall be considered Licensed Software under InterSystems’ standard commercial license terms. 
+
+Superseding License Agreement
+
+Your downloading and use of InterSystems Content constitute a “default” agreement between You and InterSystems and will govern your use of the Content in the absence of a superseding, valid and unexpired/active agreement between You and InterSystems (“Superseding License Agreement”).
+
+Upon downloading and/or using the Content , InterSystems grants you a non-exclusive, revokable, non-transferable, license to use the Content in unmodified form and in strict accordance with the terms and conditions of your Superseding License Agreement and with the documentation provided therewith.
+
+Absent a Superseding License Agreement, the following Terms of Use constitute a “default” agreement between You and InterSystems and upon downloading and use of the Content you hereby content to and shall comply with the following:
+
+
+Terms of Use of InterSystems Content
+
+Subject to the conditions stated herein, InterSystems hereby grants to You a nonexclusive, revokable, nontransferable, limited license to use InterSystems Content in unmodified form for the following purposes:
+
+•	developing, testing, prototyping and demonstrating software programs; 
+•	running the Content for training, personal use or business operations;
+•	making the Content available for use by third parties in your hosted environment and in third-party cloud environments; 
+•	redistributing Content subject to these terms of use; and
+•	copying the Content to the extent reasonably necessary to perform the above purposes and for backup purposes.
+
+The above license is subject to the following conditions:
+
+- You will use the Content in accordance with any documentation provided therewith. 
+-You must include a copy of these terms of use with any distribution of InterSystems Content;
+- You may not charge third parties any additional fees for the distribution or use of the InterSystems Content, provided however if you provide InterSystems Content along with Separately Licensed Content as part of your commercial operations, you may include InterSystems Content as part of your commercial product(s) or service(s); 
+- You may not remove any markings or notices from the InterSystems Content; 
+- You comply with all U.S. and all other applicable export control and sanctions laws and regulations (including those covering export or distribution of technical data); 
+- You may not, and You shall ensure that no party to whom you might distribute or allow to access InterSystems Content does not, reverse engineer, disassemble or decompile any of the InterSystems Content (except as may be allowed by applicable law); and 
+- InterSystems Content  may not be modified.
+
+Ownership
+
+InterSystems retains all ownership and other rights to the InterSystems Content.
+
+Information Collection
+
+Certain Content’s installation and/or auto-update processes, if any, may transmit a limited amount of data to InterSystems about those processes to help InterSystems understand and optimize them. InterSystems does not associate the data with personally identifiable information.  
+
+Disclaimer of Warranties; No Support; Limitation of Liability
+
+ALL INTERSYSTEMS CONTENT IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. INTERSYSTEMS FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NONINFRINGEMENT.
+
+NO UPDATES, ERROR CORRECTIONS OR PRODUCT SUPPORT OF ANY KIND SHALL MADE AVAILABLE OTHER THAN THOSE ITEMS INTERSYSTEMS ELECTS IN ITS SOLE DISCRETION TO MAKE AVAILABLE AS CONTENT ON THIS SITE FROM TIME TO TIME.
+
+IN NO EVENT, UNLESS REQUIRED BY APPLICABLE LAW, WILL INTERSYSTEMS BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE INTERSYSTEMS CONTENT (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE INTERSYSTEMS CONTENT TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+(end)
